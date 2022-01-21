@@ -1,3 +1,4 @@
+from tkinter import CASCADE
 from django.db import models
 
 class Student(models.Model):
@@ -19,7 +20,7 @@ class Teacher(models.Model):
 
 class SchoolClass:
     name = models.CharField(max_length=2)
-    semester = models.ForeignKey('Semester')
+    semester = models.ForeignKey('Semester', on_delete=CASCADE)
     students = models.ManyToManyField('Student')
     subjects = models.ManyToManyField('Subject')
-    tutor = models.ForeignKey('Teacher')
+    tutor = models.ForeignKey('Teacher', on_delete=CASCADE)
