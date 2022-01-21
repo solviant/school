@@ -20,7 +20,7 @@ class Teacher(models.Model):
 
 class SchoolClass:
     name = models.CharField(max_length=2)
-    semester = models.ForeignKey('Semester', on_delete=CASCADE)
+    semester = models.ForeignKey('Semester', on_delete=models.CASCADE)
     students = models.ManyToManyField('Student')
     subjects = models.ManyToManyField('Subject')
-    tutor = models.ForeignKey('Teacher', on_delete=CASCADE)
+    tutor = models.ForeignKey('Teacher', on_delete=models.RESTRICT)
