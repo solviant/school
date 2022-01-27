@@ -1,0 +1,24 @@
+<!-- <p>Test wyswietlenia panelu nauczyciela</p> -->
+<!DOCTYPE html>
+<html>
+<head>
+    <h1>Witaj w panelu nauczyciela: {{ teacher.full_name }}.</h1>
+</head>
+<body>
+    <ul>
+    {% for subject in teacher.subjects.all %}
+        <li>
+            {{ subject }}
+            {% for school_class in school_classes %}
+                {% for class_subject in school_class.subjects.all %}
+                    {% if subject=class_subject %}
+                        <li>
+                            {{ school_class.name }}
+                        </li>
+                    {% endif %}
+                {% endfor %}
+        </li>
+    {% endfor %}
+    </ul>
+</body>
+</html>

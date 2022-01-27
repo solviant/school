@@ -1,6 +1,6 @@
-from tabnanny import verbose
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.urls import reverse
 
 class Student(models.Model):
     first_name = models.CharField(max_length=50)
@@ -40,10 +40,13 @@ class Semester(models.Model):
     def __str__(self):
         return str(self.school_year) + ' - ' + str(self.number)
 
+
 class Subject(models.Model):
     name = models.CharField(max_length=50)
+    
     def __str__(self):
         return self.name
+
 
 class Teacher(models.Model):
     first_name = models.CharField(max_length=50)
@@ -56,6 +59,7 @@ class Teacher(models.Model):
         return full_name
     def __str__(self):
         return self.full_name() 
+
 
 class SchoolClass(models.Model):
     name = models.CharField(max_length=2)
@@ -76,6 +80,8 @@ class SchoolClass(models.Model):
     def __str__(self):
         return self.year_class()
 
+    def get_absolute_url(self):
+        return reverse('schoolregister:class_detail', args=[self.id])
 
 
 class Grade(models.Model):

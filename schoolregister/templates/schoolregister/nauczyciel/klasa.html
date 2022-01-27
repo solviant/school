@@ -1,0 +1,25 @@
+<!-- <p>Test wyswietlenia klasy nauczyciela</p> -->
+<!-- Trzeba dodać nauczyciela - ktory edytuje te klase. -->
+<!DOCTYPE html>
+<html>
+<head>
+    <h1>Witaj w klasie: {{ school_class.name }}</h1>
+</head>
+<body>
+    <table border>
+        <tr>
+            <th>Students</th>
+            <th colspan=10>Grades</th>
+        </tr>
+        {% for student in students %}
+            <tr>
+                <td>{{ student.full_name}}</td>
+                    {% if grades.subject %}
+                        {% if grade.students == class_subject %}
+            {% endfor %}
+            <td>5</td>
+            <td>6</td>
+        </tr>
+    </table>
+</body>
+</html>
