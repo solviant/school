@@ -2,24 +2,38 @@
 <!-- Trzeba dodać nauczyciela - ktory edytuje te klase. -->
 <!DOCTYPE html>
 <html>
+
 <head>
+<style>
+    #school_year_logo {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+</style>
+    <div id="school_year_logo">{{ school_class.school_year }}</div>
     <h1>Witaj w klasie: {{ school_class.name }}</h1>
 </head>
 <body>
     <table border>
         <tr>
             <th>Students</th>
-            <th colspan=10>Grades</th>
+            <!-- w colspan zamienić na max count grades dla studentow -->
+            <th colspan = 10>Grades</th>
         </tr>
         {% for student in students %}
-            <tr>
-                <td>{{ student.full_name}}</td>
-                    {% if grades.subject %}
-                        {% if grade.students == class_subject %}
-            {% endfor %}
-            <td>5</td>
-            <td>6</td>
-        </tr>
+            {% if student in school_class.students.all %}
+                <tr>
+                    <td>{{ student.full_name}}</td>
+                        <!-- to zamiast cyclowac w gradzie powinno w zbiorze jakos student-grade -->
+                        {% for grade in grades %}
+                            {% if grade.student == student and grade.subject == subject %}
+                                <td>{{ grade.grade }}</td>
+                            {% endif %}
+                        {% endfor %}
+                </tr>
+            {% endif %}
+        {% endfor %}
     </table>
 </body>
 </html>

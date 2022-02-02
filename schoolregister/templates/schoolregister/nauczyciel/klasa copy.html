@@ -1,0 +1,34 @@
+<!-- <p>Test wyswietlenia klasy nauczyciela</p> -->
+<!-- Trzeba dodać nauczyciela - ktory edytuje te klase. -->
+<!DOCTYPE html>
+<html>
+<head>
+    <h1>Witaj w klasie: {{ school_class.name }}</h1>
+</head>
+<body>
+    <table border>
+        <tr>
+            <th>Students</th>
+            <!-- zamienić na max count grades dla studentow -->
+            <th colspan = {{ teacher.id }}>Grades</th>
+        </tr>
+        {% for student in students %}
+            <tr>
+                <td>{{ student.full_name}}</td>
+                    {% for grade in grades %}
+                        {% for grade_student in grade.student.all %}
+                            {% if grade_student == student %}
+                                <td>2</td>
+                                {% for grade_subject in grade.subject.all %}
+                                    {% if grade_subject == subject %}
+                                        <td>1</td>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

@@ -1,12 +1,15 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.urls import reverse
+# z ksiazki django by example
+from django.conf import settings
 
 class Student(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     birth_date = models.DateField()
     
+    # Może poprawic, zeby byla tylko linijka z return?
     @property
     def full_name(self):
         first_name = self.first_name

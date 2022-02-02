@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
-    path('schoolregister/', include('schoolregister.urls', namespace='schoolregister')),
+    path('', include('django.contrib.auth.urls')),
+    path('schoolregister/', include('schoolregister.urls', namespace='schoolregister')), # czy dac , namespace='schoolregister'
     path('admin/', admin.site.urls),
 ]
