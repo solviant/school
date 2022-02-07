@@ -17,7 +17,8 @@ from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
-    path('', include('django.contrib.auth.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
+    # path('', include('django.contrib.auth.urls')), # Czemu bez 'accounts/' a z samym '' - nie dziala
     path('schoolregister/', include('schoolregister.urls', namespace='schoolregister')), # czy dac , namespace='schoolregister'
     path('admin/', admin.site.urls),
 ]

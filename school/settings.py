@@ -27,10 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-# Dodane do logowania z ksiazki djangobyexample
-LOGIN_REDIRECT_URL = 'schoolregister:dashboard'
-LOGIN_URL = 'schoolregister:login'
-LOGOUT_URL = 'schoolregister:logout'
 
 # Application definition
 
@@ -129,3 +125,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # z ksiazki django by example
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+# # Dodane do logowania z ksiazki djangobyexample
+# LOGIN_REDIRECT_URL = 'schoolregister:dashboard'
+# LOGIN_URL = 'schoolregister:login'
+# LOGOUT_URL = 'schoolregister:logout'

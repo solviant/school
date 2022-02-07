@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.conf import settings
 
 class Student(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     birth_date = models.DateField()
@@ -52,6 +53,7 @@ class Subject(models.Model):
 
 
 class Teacher(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     subjects = models.ManyToManyField('Subject')
@@ -84,7 +86,7 @@ class SchoolClass(models.Model):
         return self.year_class()
 
     def get_absolute_url(self):
-        return reverse('schoolregister:class_detail', args=[self.id])
+        return reverse('schoolregister:class_students', args=[self.id])
 
 
 class Grade(models.Model):

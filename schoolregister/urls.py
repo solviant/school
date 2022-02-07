@@ -1,14 +1,15 @@
 from django.contrib.auth import views as auth_views
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 app_name = 'schoolregister'
 
 urlpatterns = [
-    # path('', views.test_site, name='test_site'), # sprawdzic czy da sie wyrownac
+    path('accounts/', include('django.contrib.auth.urls')),
     path('', views.dashboard, name='dashboard'),
     path('nauczyciel/', views.teacher_panel, name='teacher_panel'),
-    path('nauczyciel/<int:id>/', views.class_detail, name='class_detail'),
+    path('nauczyciel/<int:school_class_id>/', views.class_students, name='class_students'),
+    path('nauczyciel/<int:school_class_id>/<int:subject_id>/', views.class_detail, name='class_detail'),
     # path('login/', views.user_login, name='login'),
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
@@ -21,4 +22,6 @@ urlpatterns = [
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
     path('register/', views.register, name='register'),
+    path('test_site/', views.test_site, name='test_site'), # sprawdzic czy da sie wyrownac
+    path('test_site02/', views.test_site02, name='test_site02'),
 ]

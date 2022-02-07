@@ -14,7 +14,7 @@
                 {% for class_subject in school_class.subjects.all %}
                     {% if subject == class_subject %}
                         <li>
-                            <a href="{{ school_class.get_absolute_url }}">
+                            <a href="{{ school_class.get_absolute_url }}{{ subject.id }}/">
                                 {{ school_class.name }}
                             </a>
                         </li>
