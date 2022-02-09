@@ -1,7 +1,8 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from .forms import LoginForm, UserRegistrationForm, GradeForm
 from .models import Grade, SchoolYear, Semester, SchoolClass, Subject, Student, Teacher
 
@@ -62,8 +63,10 @@ def class_detail(request, school_class_id, subject_id):
     students = Student.objects.all()
     grades = Grade.objects.all()
     subject = get_object_or_404(Subject, id=subject_id) # !! <Subject.objects.get(pk=1)> To jest do zmiany, na razie wpisane na twardo jako test - przyklad.
+    grade_form = GradeForm()
     return render(request, 'schoolregister/nauczyciel/klasa.html', {
-        'school_class': school_class, 'students': students, 'grades': grades, 'subject': subject})
+        'school_class': school_class, 'students': students, 
+        'grades': grades, 'subject': subject, 'grade_form': grade_form})
 
 
 @login_required
@@ -101,6 +104,14 @@ def test_site(request):
 
 
 def test_site02(request):
-    grade_form = GradeForm()
+    if request.method == 'POST':
+        grade_form = GradeForm(request.POST)
+        if grade_form.is_valid():
+            grade_form.save()
+            return HttpResponseRedirect('')
+
+    else:
+        grade_form = GradeForm()
+
     return render(request, 'schoolregister/test_site02.html',
     {'grade_form': grade_form})

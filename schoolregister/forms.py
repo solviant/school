@@ -6,11 +6,11 @@ from .models import Grade
 
 
 class GradeForm(forms.ModelForm):
-
     class Meta:
         model = Grade
-        fields = ('grade',)
+        fields = ('grade', 'school_year', 'semester', 'subject', 'student',)
 
+    # widget = forms.HiddenInput()
 
 class LoginForm(forms.Form):
     username = forms.CharField()

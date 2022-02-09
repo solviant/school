@@ -31,6 +31,14 @@
                                 <td>{{ grade.grade }}</td>
                             {% endif %}
                         {% endfor %}
+                        <td>
+                            <form method="post">
+                                {{ grade_form.as_p }}
+                                {% csrf_token %}
+                                <input type="hidden" name="school_year" value={{ school_class.school_year }} />
+                                <p><input type="submit" value="Add grade"></p>
+                            </form>
+                        </td>
                 </tr>
             {% endif %}
         {% endfor %}
