@@ -21,26 +21,32 @@
             <!-- w colspan zamienić na max count grades dla studentow -->
             <th colspan = 10>Grades</th>
         </tr>
-        {% for student in students %}
-            {% if student in school_class.students.all %}
-                <tr>
-                    <td>{{ student.full_name}}</td>
-                        <!-- to zamiast cyclowac w gradzie powinno w zbiorze jakos student-grade -->
-                        {% for grade in grades %}
-                            {% if grade.student == student and grade.subject == subject %}
-                                <td>{{ grade.grade }}</td>
-                            {% endif %}
-                        {% endfor %}
-                        <td>
-                            <form method="post">
-                                {{ grade_form.as_p }}
-                                {% csrf_token %}
-                                <input type="hidden" name="school_year" value={{ school_class.school_year }} />
-                                <p><input type="submit" value="Add grade"></p>
-                            </form>
-                        </td>
-                </tr>
-            {% endif %}
+        {% for student in students_list %}
+            <tr>
+                <td>{{ student.full_name }}</td>
+                    <!-- to zamiast cyclowac w gradzie powinno w zbiorze jakos student-grade -->
+                    {% for grade in grades_list %}
+                        {% if grade.student == student and grade.subject == subject %}
+                            <td>{{ grade.grade }}</td>
+                            {% comment %}<td>
+                                <form method="post">
+                                    {{ grade_form.as_p }}
+                                    {% csrf_token %}
+                                    <input type="hidden" name="subject" value={{ subject.id }} />
+                                    <p><input type="submit" value="Add grade"></p>
+                                </form>
+                            </td>{% endcomment %}
+                        {% endif %}
+                    {% endfor %}
+                    <td>
+                        <form method="post">
+                            {{ grade_form.as_p }}
+                            {% csrf_token %}
+                            <input type="hidden" name="subject" value={{ subject.id }} />
+                            <p><input type="submit" value="Add grade"></p>
+                        </form>
+                    </td>
+            </tr>
         {% endfor %}
     </table>
 </body>

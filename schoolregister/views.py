@@ -61,12 +61,38 @@ def class_detail(request, school_class_id, subject_id):
     school_class = get_object_or_404(SchoolClass, id=school_class_id)
     # subject = get_object_or_404(Subject, id=subject_id)
     students = Student.objects.all()
+    students_list = []
     grades = Grade.objects.all()
-    subject = get_object_or_404(Subject, id=subject_id) # !! <Subject.objects.get(pk=1)> To jest do zmiany, na razie wpisane na twardo jako test - przyklad.
-    grade_form = GradeForm()
+    subject = Subject.objects.get(id=subject_id) # !! <Subject.objects.get(pk=1)> To jest do zmiany, na razie wpisane na twardo jako test - przyklad.
+    grades_list = []
+
+   
+    for sc_student in school_class.students.all():
+        students_list.append(sc_student)
+        # sprawdzic mozliwosc uzycia "entry_set"
+        for grade in grades:
+            if grade.student == sc_student and grade.subject == subject:
+                grades_list.append(grade)
+    
+                grade_form = GradeForm()
+                if request.method == 'POST':
+                    grade_form = GradeForm(request.POST)
+                    grade_form.subject = subject
+                    if grade_form.is_valid():
+                        grade_form.save()
+                        return HttpResponseRedirect('')
+                    # else:
+                    #     return HttpResponse("Error.")
+
+                else:
+                    grade_form = GradeForm()
+                    grade_form.subject = subject
+    
     return render(request, 'schoolregister/nauczyciel/klasa.html', {
         'school_class': school_class, 'students': students, 
-        'grades': grades, 'subject': subject, 'grade_form': grade_form})
+        'grades': grades, 'subject': subject, 'grade_form': grade_form,
+        'students_list': students_list,
+        'grades_list': grades_list,})
 
 
 @login_required
@@ -109,6 +135,8 @@ def test_site02(request):
         if grade_form.is_valid():
             grade_form.save()
             return HttpResponseRedirect('')
+        else:
+            return HttpResponse("Error.")
 
     else:
         grade_form = GradeForm()

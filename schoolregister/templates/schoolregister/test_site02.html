@@ -2,6 +2,7 @@
     <form method="post">
         {{ grade_form.as_p }}
         {% csrf_token %}
+        <input type="hidden" name="subject" value=2 />
         <p><input type="submit" value="Save_and_return"></p>
     </form>
         {% comment %}<input type="hidden" name="school_year_id" value=1 />{% endcomment %}

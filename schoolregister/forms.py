@@ -1,15 +1,19 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Grade
+from .models import Grade, Subject
 
 
 
 
 class GradeForm(forms.ModelForm):
+
+    subject = forms.ModelChoiceField(queryset=Subject.objects.all(), widget=forms.HiddenInput())
+
     class Meta:
         model = Grade
         fields = ('grade', 'school_year', 'semester', 'subject', 'student',)
 
+    # class GradeFormAuto()
     # widget = forms.HiddenInput()
 
 class LoginForm(forms.Form):
