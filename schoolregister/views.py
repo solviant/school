@@ -60,39 +60,53 @@ def class_students(request, school_class_id):
 def class_detail(request, school_class_id, subject_id):
     school_class = get_object_or_404(SchoolClass, id=school_class_id)
     # subject = get_object_or_404(Subject, id=subject_id)
+    semesters = school_class.school_year.semester_set.all()
     students = Student.objects.all()
     students_list = []
     grades = Grade.objects.all()
     subject = Subject.objects.get(id=subject_id) # !! <Subject.objects.get(pk=1)> To jest do zmiany, na razie wpisane na twardo jako test - przyklad.
     grades_list = []
-
-   
+    max_count_grades_1st = 0
+    max_count_grades_2nd = 0
+    semesters_len = len(semesters)
+    
     for sc_student in school_class.students.all():
         students_list.append(sc_student)
         # sprawdzic mozliwosc uzycia "entry_set"
-        for grade in grades:
-            if grade.student == sc_student and grade.subject == subject:
-                grades_list.append(grade)
-    
-                grade_form = GradeForm()
-                if request.method == 'POST':
-                    grade_form = GradeForm(request.POST)
-                    grade_form.subject = subject
-                    if grade_form.is_valid():
-                        grade_form.save()
-                        return HttpResponseRedirect('')
-                    # else:
-                    #     return HttpResponse("Error.")
-
-                else:
+        for semester in semesters:
+            for grade in grades:
+                if grade.student == sc_student and grade.subject == subject and grade.semester == semester:
+                    grades_list.append(grade)
+                    if semester.number == 1:
+                        max_count_grades_1st += 1
+                    elif semester.number == 2:
+                        max_count_grades_2nd += 1
                     grade_form = GradeForm()
-                    grade_form.subject = subject
+                    if request.method == 'POST':
+                        grade_form = GradeForm(request.POST)
+                        # grade_form.subject = subject  # To nie działa
+                        if grade_form.is_valid():
+                            grade_form.save()
+                            return HttpResponseRedirect('')
+                        # else:
+                        #     return HttpResponse("Error.")
+
+                    else:
+                        grade_form = GradeForm()
+                        # grade_form.subject = subject  # To nie działa
     
+    col_span_1_sem = max_count_grades_1st
+    col_span_2_sem = max_count_grades_2nd
+
     return render(request, 'schoolregister/nauczyciel/klasa.html', {
         'school_class': school_class, 'students': students, 
         'grades': grades, 'subject': subject, 'grade_form': grade_form,
         'students_list': students_list,
-        'grades_list': grades_list,})
+        'grades_list': grades_list, 
+        'col_span_1_sem': col_span_1_sem,
+        'col_span_2_sem': col_span_2_sem,
+        'semesters': semesters,
+        'semesters_len': semesters_len,})
 
 
 @login_required
@@ -143,3 +157,7 @@ def test_site02(request):
 
     return render(request, 'schoolregister/test_site02.html',
     {'grade_form': grade_form})
+
+
+def test_site03(request):
+    return render(request, 'schoolregister/test_site03.html')

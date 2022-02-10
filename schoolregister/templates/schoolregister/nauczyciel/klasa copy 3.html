@@ -1,0 +1,60 @@
+<!-- <p>Test wyswietlenia klasy nauczyciela</p> -->
+<!-- Trzeba dodać nauczyciela - ktory edytuje te klase. -->
+<!DOCTYPE html>
+<html>
+
+<head>
+<style>
+    #school_year_logo {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+</style>
+    <div id="school_year_logo">{{ school_class.school_year }}</div>
+    <h1>Witaj w klasie: {{ school_class.name }}</h1>
+</head>
+<body>
+    <table border>
+        <tr>
+            <th>Students</th>
+            <!-- w colspan zamienić na max count grades dla studentow -->
+            <th colspan = 10>Grades</th>
+        </tr>
+        {% for student in students_list %}
+            <tr>
+                <td>{{ student.full_name }}</td>
+                    <!-- to zamiast cyclowac w gradzie powinno w zbiorze jakos student-grade -->
+                    {% for grade in grades_list %}
+                        {% if grade.student == student and grade.subject == subject %}
+                            <td>{{ grade.grade }}</td>
+                            {% comment %}<td>
+                                <form method="post">
+                                    {{ grade_form.as_p }}
+                                    {% csrf_token %}
+                                    <input type="hidden" name="school_year" value={{ subject.id }} />
+                                    <input type="hidden" name="semester" value={{ subject.id }} />
+                                    <input type="hidden" name="subject" value={{ subject.id }} />
+                                    <input type="hidden" name="student" value={{ subject.id }} />
+                                    <p><input type="submit" value="Add grade"></p>
+                                </form>
+                            </td>{% endcomment %}
+                        {% endif %}
+                    {% endfor %}
+                    <td>
+                        Nowa ocena:
+                        <form method="post">
+                            {{ grade_form.as_p }}
+                            {% csrf_token %}
+                            <input type="hidden" name="school_year" value={{ school_class.school_year.id }} />
+                            {% comment %}<input type="hidden" name="semester" value={{ subject.id }} />{% endcomment %}
+                            <input type="hidden" name="subject" value={{ subject.id }} />
+                            <input type="hidden" name="student" value={{ student.id }} />
+                            <p><input type="submit" value="Dodaj"></p>
+                        </form>
+                    </td>
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

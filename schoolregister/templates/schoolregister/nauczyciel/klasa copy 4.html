@@ -37,9 +37,9 @@
             <tr>
                 <td>{{ student.full_name }}</td>
                     <!-- to zamiast cyclowac w gradzie moze powinno w zbiorze jakos student-grade -->
-                    {% for semester in semesters %}
+                    
                         {% for grade in grades_list %}
-                            {% if grade.student == student and grade.subject == subject and grade.semester == semester %}
+                            {% if grade.student == student and grade.subject == subject %}
                                 <td>{{ grade.grade }}<br>
                                     {{ grade.description }}
                                     <!-- dodać formularz do edycji oceny -->
@@ -63,17 +63,11 @@
                                 {{ grade_form.as_p }}
                                 {% csrf_token %}
                                 <input type="hidden" name="school_year" value={{ school_class.school_year.id }} />
-                                <input type="hidden" name="semester" value={{ subject.id }} />
+                                {% comment %}<input type="hidden" name="semester" value={{ subject.id }} />{% endcomment %}
                                 <input type="hidden" name="subject" value={{ subject.id }} />
                                 <input type="hidden" name="student" value={{ student.id }} />
                                 <p><input type="submit" value="Dodaj"></p>
                             </form>
-                        </td>
-                        <td>
-                            Ocena końcowa:
-                        </td>
-                        <td>
-                            Średnia ocen:
                         </td>
                     {% endfor %}
             </tr>
