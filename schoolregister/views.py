@@ -61,50 +61,88 @@ def class_detail(request, school_class_id, subject_id):
     school_class = get_object_or_404(SchoolClass, id=school_class_id)
     # subject = get_object_or_404(Subject, id=subject_id)
     semesters = school_class.school_year.semester_set.all()
-    students = Student.objects.all()
+    students = Student.objects.all() # czy tu <class>_set.all po school_class?
     students_list = []
-    grades = Grade.objects.all()
+    grades = Grade.objects.all() # czy tu <class>_set.all po school_class?
     subject = Subject.objects.get(id=subject_id) # !! <Subject.objects.get(pk=1)> To jest do zmiany, na razie wpisane na twardo jako test - przyklad.
+    grades_list_1st = []
+    grades_list_2nd = []
+    uczniowie_lista = []
     grades_list = []
+    # students_grades = [{'students': uczniowie_lista}, {'grades': []}]
+    x = {'Wozniak': [1, 2, 3]}
     max_count_grades_1st = 0
     max_count_grades_2nd = 0
     semesters_len = len(semesters)
-    
+    i = -1
+
+    # for sc_student in school_class.students.all():
+    #     students_list.append(sc_student)
+    #     grades_list.append(sc_student.grade_set.filter(school_year_id=school_class.school_year.id, semester_id=1, subject_id=1, student_id=sc_student.id))
+    # students_grades = zip(students_list, grades_list)
+    # [[students], [[scs_grades],[],...]]
+
+    if request.method == 'POST':
+        grade_form = GradeForm(request.POST)
+        # grade_form.subject = subject  # To nie działa
+        if grade_form.is_valid():
+            grade_form.save()
+            return HttpResponseRedirect('')
+        # else:
+        #     return HttpResponse("Error.")
+    else:
+        grade_form = GradeForm()
+        # grade_form.subject = subject  # To nie działa
+
+
+    # w petli najpierw powinien byc semester
+
     for sc_student in school_class.students.all():
         students_list.append(sc_student)
+        grades_list.append(sc_student.grade_set.filter(school_year_id=school_class.school_year.id, semester_id=1, subject_id=1, student_id=sc_student.id))
         # sprawdzic mozliwosc uzycia "entry_set"
         for semester in semesters:
-            for grade in grades:
-                if grade.student == sc_student and grade.subject == subject and grade.semester == semester:
-                    grades_list.append(grade)
-                    if semester.number == 1:
-                        max_count_grades_1st += 1
-                    elif semester.number == 2:
+            if semester.number == 1:
+                grades_count_1st = len(grades.filter(school_year_id=school_class.school_year.id, semester_id=semester.id, subject_id=subject.id, student_id=sc_student.id))
+                if max_count_grades_1st < grades_count_1st:
+                    max_count_grades_1st = grades_count_1st
+                
+                
+                
+    for sc_student in school_class.students.all():
+        for semester in semesters:
+            if semester.number == 1:            
+                for grade in grades:
+                    if grade.student == sc_student and grade.subject == subject and grade.semester == semester:
+                        grades_list_1st.append(grade)
+                        # if student_grades[sc_student.full_name]:
+                        # i += 1
+                        # uczniowie_lista.append(sc_student)
+            elif semester.number == 2:
+                grades_count_2nd = len(grades.filter(school_year_id=school_class.school_year.id, semester_id=semester.id, subject_id=subject.id, student_id=sc_student.id))
+                if max_count_grades_2nd < grades_count_2nd:
+                    max_count_grades_2nd = grades_count_2nd
+                for grade in grades:
+                    if grade.student == sc_student and grade.subject == subject and grade.semester == semester:
+                        grades_list_2nd.append(grade)
                         max_count_grades_2nd += 1
-                    grade_form = GradeForm()
-                    if request.method == 'POST':
-                        grade_form = GradeForm(request.POST)
-                        # grade_form.subject = subject  # To nie działa
-                        if grade_form.is_valid():
-                            grade_form.save()
-                            return HttpResponseRedirect('')
-                        # else:
-                        #     return HttpResponse("Error.")
-
-                    else:
-                        grade_form = GradeForm()
-                        # grade_form.subject = subject  # To nie działa
     
-    col_span_1_sem = max_count_grades_1st
-    col_span_2_sem = max_count_grades_2nd
+    col_span_1_sem = max_count_grades_1st + 3
+    col_span_2_sem = max_count_grades_2nd + 3
+    col_span_year = col_span_1_sem + col_span_2_sem
 
     return render(request, 'schoolregister/nauczyciel/klasa.html', {
         'school_class': school_class, 'students': students, 
         'grades': grades, 'subject': subject, 'grade_form': grade_form,
         'students_list': students_list,
-        'grades_list': grades_list, 
+        'grades_list': grades_list,
+        'grades_list_1st': grades_list_1st,
+        'grades_list_2nd': grades_list_2nd,
+        'max_count_grades_1st': max_count_grades_1st,
+        'max_count_grades_2nd': max_count_grades_2nd, 
         'col_span_1_sem': col_span_1_sem,
         'col_span_2_sem': col_span_2_sem,
+        'col_span_year': col_span_year,
         'semesters': semesters,
         'semesters_len': semesters_len,})
 
@@ -161,3 +199,6 @@ def test_site02(request):
 
 def test_site03(request):
     return render(request, 'schoolregister/test_site03.html')
+
+def test_site04(request):
+    return render(request, 'schoolregister/test_site04.html')

@@ -17,10 +17,19 @@
 <body>
     <table border>
         <tr>
-            <th>Uczniowie</th>
+            <th></th>
+            <th colspan={{ col_span_year }}>Oceny</th>
+            {% if "{{ grades.school_year.semester.objects.get(pk=2) }}" > 1 %}
+                <th>Semestr 2</th>
+            {% endif %}
+        </tr>
+        <tr>
+            <th>Students</th>
             {% for semester in semesters %}
                     {% if semester.number == 1 %}
-                        <th colspan = {{ col_span_1_sem }}>Oceny - semestr {{ semester.number }}</th>
+                        <th colspan = {{ col_span_1_sem }}>Semestr {{ semester.number }}</th>
+                    {% elif semester.number == 2 %}
+                        <th colspan = {{ col_span_2_sem }}>Semestr {{ semester.number }}</th>
                     {% endif %}
             {% endfor %}
         </tr>
@@ -37,9 +46,7 @@
                                         <!-- dodać formularz do edycji oceny -->
                                     </td>
                                 {% endif %}
-                            {% empty %}
-                                <td> fuck </td>
-                            {% endfor %}    
+                            {% endfor %}
                             <td>
                                 Nowa ocena:
                                 <form method="post">
@@ -58,27 +65,7 @@
                             <td>
                                 Średnia ocen:
                             </td>
-                        {% endif %}
-                    {% endfor %}
-            </tr>
-        {% endfor %}
-    </table>
-    <p>Drugi semestr</p>          
-    <table border>
-        <tr>
-            <th>Uczniowie</th>
-            {% for semester in semesters %}
-                    {% if semester.number == 2 %}
-                        <th colspan = {{ col_span_2_sem }}>Oceny - semestr {{ semester.number }}</th>
-                    {% endif %}
-            {% endfor %}
-        </tr>
-        {% for student in students_list %}
-            <tr>
-                <td>{{ student.full_name }}</td>
-                    <!-- to zamiast cyclowac w gradzie moze powinno w zbiorze jakos student-grade -->
-                    {% for semester in semesters %}                    
-                        {% if semester.number == 2 %}
+                        {% elif semester.number == 2 %}
                             {% for grade in grades_list_2nd %}
                                 {% if grade.student == student and grade.subject == subject and grade.semester == semester %}
                                     <td>{{ grade.grade }}<br>

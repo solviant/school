@@ -25,4 +25,5 @@ urlpatterns = [
     path('test_site/', views.test_site, name='test_site'), # sprawdzic czy da sie wyrownac
     path('test_site02/', views.test_site02, name='test_site02'),
     path('test_site03/', views.test_site03, name='test_site03'),
+    path('test_site04/', views.test_site04, name='test_site04'),
 ]

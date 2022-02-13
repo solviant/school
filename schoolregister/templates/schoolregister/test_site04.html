@@ -1,0 +1,131 @@
+<html>
+<head>
+<style>
+    tr, th, td {
+        border: 3px solid red;
+    }
+    th.WithoutBorder {
+        border: 0;
+    }
+    tr.WithoutBorder {
+        border: 0;
+    }
+    th.WithoutBorder {
+        border: 0;
+    }
+    tr.WithoutBorder {
+        border: 0;
+    }
+
+    table, tr, td {
+        border: 3px solid red;
+    }
+    tr.noBorder td {
+        border: 0;
+    }
+    tr, td {
+        border: 3px solid green;
+    }
+    tr.noBorder td {
+        border: 0;
+    }
+    table, th, td {
+       border: 2px solid green;
+      }
+      tr.hide_right > td, td.hide_right{
+        border-right-style:hidden;
+      }
+      tr.hide_all > td, td.hide_all{
+        border-style:hidden;
+      }
+    table, th, td {
+               border: 1px solid;
+              }
+              
+              tr.hide_all > td, td.hide_all{
+                 border: 0;
+                
+              }
+</style> 
+</head>
+    <p>c</p>
+    <p>c</p>
+    <table>
+        <tr class="WithoutBorder">
+            <th class="WithoutBorder"></th>
+            <th>Tabeli Tabeli</th>
+        </tr>
+        <tr>
+            <td>Value Value</td>
+        </tr>
+    </table>
+    <p>c</p>
+    <table>
+        <tr>
+          <td>A1</td>
+          <td>B1</td>
+          <td>C1</td>
+        </tr>
+        <tr>
+            <td>A1</td>
+            <td>B1</td>
+            <td>C1</td>
+          </tr>
+        <tr class="noBorder">
+          <td>A2</td>
+          <td>B2</td>
+          <td>C2</td>
+        </tr>
+        <tr>
+          <td>A3</td>
+          <td>A3</td>
+          <td>A3</td>
+        </tr>
+    </table>
+    <p>c</p>
+    <table>
+        <tr>
+            <td class="hide_right">11</td>
+            <td>12</td>
+            <td class="hide_all">13</td>
+        </tr>
+        <tr class="hide_right">
+            <td>21</td>
+            <td>22</td>
+            <td>23</td>
+        </tr>
+        <tr class="hide_all">
+            <td>31</td>
+            <td>32</td>
+            <td>33</td>
+        </tr>
+    </table>
+    <p>c</p>
+    <table>
+        <tr>
+          <th>Firstname</th>
+          <th>Lastname</th>
+          <th>Savings</th>
+        </tr>
+        <tr>
+          <td>Peter</td>
+          <td>Griffin</td>
+          <td>$100</td>
+        </tr>
+        <tr class= hide_all>
+          <td>Lois</td>
+          <td>Griffin</td>
+          <td>$150</td>
+        </tr>
+        <tr>
+          <td>Joe</td>
+          <td>Swanson</td>
+          <td>$300</td>
+        </tr>
+        <tr>
+          <td>Cleveland</td>
+          <td>Brown</td>
+          <td>$250</td>
+        </tr>
+    </table>
+</html>
