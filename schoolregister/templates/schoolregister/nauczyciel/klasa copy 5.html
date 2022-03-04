@@ -15,60 +15,55 @@
     <h1>Witaj w klasie: {{ school_class.name }}</h1>
 </head>
 <body>
-    <p>Pierwszy semestr</p>
     <table border>
         <tr>
             <th>Uczniowie</th>
             {% for semester in semesters %}
-                {% if semester.number == 1 %}
-                    <th colspan = {{ col_span_1_sem }}>Oceny - semestr {{ semester.number }}</th>
-                {% endif %}
+                    {% if semester.number == 1 %}
+                        <th colspan = {{ col_span_1_sem }}>Oceny - semestr {{ semester.number }}</th>
+                    {% endif %}
             {% endfor %}
         </tr>
-        {% for semester in semesters %}
-            {% if semester.number == 1 %}
-                {% for student in students_grades_1_sem %}
-                    <tr>
-                        <td>{{ student.0 }}</td>
-                            <!-- to zamiast cyclowac w gradzie moze powinno w zbiorze jakos student-grade -->
-                            {% for grade in student.1 %}
-                                <td><a href="/{{ student.0.last_name }}_{{ student.0.first_name }}/{{ school_class.name }}/{{ subject }}/?{{ grade }}" value="{{ grade }}">{{ grade }}</a><br>
-                                    {{ grade.description }}<br>
-                                </td>
-                            {% endfor %}
-                            {% for to_max in student.2 %}
-                                <td></td>
-                            {% endfor %}
-                            {% comment %}
-                            {% if student.1|length < max_count_grades_1_sem %}
-                                
-                                {% for i in (max_count_grades_1_sem - student.1|length) %}
-                                    <td>ab</td>
-                                {% endfor %}
-                            {% endif %}
-                            {% endcomment %}
-                                <td>
-                                    Nowa ocena:
-                                    <form method="post">
-                                        {{ grade_form.as_p }}
-                                        {% csrf_token %}
-                                        <input type="hidden" name="school_year" value={{ school_class.school_year.id }} />
-                                        <input type="hidden" name="semester" value={{ semester.id }} />
-                                        <input type="hidden" name="subject" value={{ subject.id }} />
-                                        <input type="hidden" name="student" value={{ student.0.id }} />
-                                        <p><input type="submit" value="Dodaj"></p>
-                                    </form>
-                                </td>
-                                <td>
-                                    Ocena końcowa:
-                                </td>
-                                <td>
-                                    Średnia ocen:
-                                </td>
-                {% endfor %}
-            {% endif %}
+        {% for student in students_list %}
+            <tr>
+                <td>{{ student.full_name }}</td>
+                    <!-- to zamiast cyclowac w gradzie moze powinno w zbiorze jakos student-grade -->
+                    {% for semester in semesters %}
+                        {% if semester.number == 1 %}
+                            {% for grade in grades_list_1st %}
+                                {% if grade.student == student and grade.subject == subject and grade.semester == semester %}
+                                    <td>{{ grade.grade }}<br>
+                                        {{ grade.description }}
+                                        <!-- dodać formularz do edycji oceny -->
+                                    </td>
+                                {% endif %}
+                                {% if student.grade_set.filter(school_year_id=school_class.school_year.id, semester_id=1, subject_id=1, student_id=sc_student.id)|length < max_count_grades_1st %}
+                                    <td>test</td>
+                            {% empty %}
+                                <td> fuck </td>
+                            {% endfor %}    
+                            <td>
+                                Nowa ocena:
+                                <form method="post">
+                                    {{ grade_form.as_p }}
+                                    {% csrf_token %}
+                                    <input type="hidden" name="school_year" value={{ school_class.school_year.id }} />
+                                    <input type="hidden" name="semester" value={{ semester.id }} />
+                                    <input type="hidden" name="subject" value={{ subject.id }} />
+                                    <input type="hidden" name="student" value={{ student.id }} />
+                                    <p><input type="submit" value="Dodaj"></p>
+                                </form>
+                            </td>
+                            <td>
+                                Ocena końcowa:
+                            </td>
+                            <td>
+                                Średnia ocen:
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+            </tr>
         {% endfor %}
-                </tr>
     </table>
     <p>Drugi semestr</p>          
     <table border>
