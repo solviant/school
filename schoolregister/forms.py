@@ -13,10 +13,17 @@ class GradeForm(forms.ModelForm):
     
     class Meta:
         model = Grade
-        fields = ('grade', 'school_year', 'semester', 'subject', 'student', 'description')
+        fields = ('mark', 'school_year', 'semester', 'subject', 'student', 'description')
 
     # class GradeFormAuto()
     # widget = forms.HiddenInput()
+
+
+class GradeToEdit(forms.ModelForm):
+    class Meta:
+        model = Grade
+        fields = ('mark', 'school_year', 'semester', 'subject', 'student', 'description')
+
 
 class LoginForm(forms.Form):
     username = forms.CharField()

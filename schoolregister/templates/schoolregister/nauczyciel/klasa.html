@@ -12,7 +12,8 @@
     }
 </style>
     <div id="school_year_logo">{{ school_class.school_year }}</div>
-    <h1>Witaj w klasie: {{ school_class.name }}</h1>
+    <h2>Witaj w klasie: {{ school_class.name }}</h2>
+    <h2>Przedmiot: {{ subject.name }}</h2>
 </head>
 <body>
     <p>Pierwszy semestr</p>
@@ -32,21 +33,13 @@
                         <td>{{ student.0 }}</td>
                             <!-- to zamiast cyclowac w gradzie moze powinno w zbiorze jakos student-grade -->
                             {% for grade in student.1 %}
-                                <td><a href="/{{ student.0.last_name }}_{{ student.0.first_name }}/{{ school_class.name }}/{{ subject }}/?{{ grade }}" value="{{ grade }}">{{ grade }}</a><br>
+                                <td><a href="{% url 'schoolregister:edit_grade' grade.id %}" value="{{ grade }}">{{ grade }}</a><br>
                                     {{ grade.description }}<br>
                                 </td>
                             {% endfor %}
                             {% for to_max in student.2 %}
                                 <td></td>
                             {% endfor %}
-                            {% comment %}
-                            {% if student.1|length < max_count_grades_1_sem %}
-                                
-                                {% for i in (max_count_grades_1_sem - student.1|length) %}
-                                    <td>ab</td>
-                                {% endfor %}
-                            {% endif %}
-                            {% endcomment %}
                                 <td>
                                     Nowa ocena:
                                     <form method="post">
@@ -75,47 +68,47 @@
         <tr>
             <th>Uczniowie</th>
             {% for semester in semesters %}
-                    {% if semester.number == 2 %}
-                        <th colspan = {{ col_span_2_sem }}>Oceny - semestr {{ semester.number }}</th>
-                    {% endif %}
+                {% if semester.number == 2 %}
+                    <th colspan = {{ col_span_2_sem }}>Oceny - semestr {{ semester.number }}</th>
+                {% endif %}
             {% endfor %}
         </tr>
-        {% for student in students_list %}
-            <tr>
-                <td>{{ student.full_name }}</td>
-                    <!-- to zamiast cyclowac w gradzie moze powinno w zbiorze jakos student-grade -->
-                    {% for semester in semesters %}                    
-                        {% if semester.number == 2 %}
-                            {% for grade in grades_list_2nd %}
-                                {% if grade.student == student and grade.subject == subject and grade.semester == semester %}
-                                    <td>{{ grade.grade }}<br>
-                                        {{ grade.description }}
-                                        <!-- dodać formularz do edycji oceny -->
-                                    </td>
-                                {% endif %}
+        {% for semester in semesters %}
+            {% if semester.number == 2 %}
+                {% for student in students_grades_2_sem %}
+                    <tr>
+                        <td>{{ student.0 }}</td>
+                            <!-- to zamiast cyclowac w gradzie moze powinno w zbiorze jakos student-grade -->
+                            {% for grade in student.1 %}
+                                <td><a href="{% url 'schoolregister:edit_grade' grade.id %}" value="{{ grade }}">{{ grade }}</a><br>
+                                    {{ grade.description }}<br>
+                                </td>
                             {% endfor %}
-                            <td>
-                                Nowa ocena:
-                                <form method="post">
-                                    {{ grade_form.as_p }}
-                                    {% csrf_token %}
-                                    <input type="hidden" name="school_year" value={{ school_class.school_year.id }} />
-                                    <input type="hidden" name="semester" value={{ semester.id }} />
-                                    <input type="hidden" name="subject" value={{ subject.id }} />
-                                    <input type="hidden" name="student" value={{ student.id }} />
-                                    <p><input type="submit" value="Dodaj"></p>
-                                </form>
-                            </td>
-                            <td>
-                                Ocena końcowa:
-                            </td>
-                            <td>
-                                Średnia ocen:
-                            </td>
-                        {% endif %}
-                    {% endfor %}
-            </tr>
+                            {% for to_max2 in student.2 %}
+                                <td></td>
+                            {% endfor %}
+                                <td>
+                                    Nowa ocena:
+                                    <form method="post">
+                                        {{ grade_form.as_p }}
+                                        {% csrf_token %}
+                                        <input type="hidden" name="school_year" value={{ school_class.school_year.id }} />
+                                        <input type="hidden" name="semester" value={{ semester.id }} />
+                                        <input type="hidden" name="subject" value={{ subject.id }} />
+                                        <input type="hidden" name="student" value={{ student.0.id }} />
+                                        <p><input type="submit" value="Dodaj"></p>
+                                    </form>
+                                </td>
+                                <td>
+                                    Ocena końcowa:
+                                </td>
+                                <td>
+                                    Średnia ocen:
+                                </td>
+                {% endfor %}
+            {% endif %}
         {% endfor %}
+                </tr>
     </table>
 </body>
 </html>

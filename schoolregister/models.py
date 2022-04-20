@@ -89,8 +89,9 @@ class SchoolClass(models.Model):
         return reverse('schoolregister:class_students', args=[self.id])
 
 
+# czy dodac lub zamienic cos na school_class?
 class Grade(models.Model):
-    grade = models.DecimalField(max_digits=2, decimal_places=1, choices=[
+    mark = models.DecimalField(max_digits=2, decimal_places=1, choices=[
         (1, 1), (1.5, 1.5), (2, 2), (2.5, 2.5), (3, 3), (3.5, 3.5), (4, 4), (4.5, 4.5), (5, 5), 
         (5.5, 5.5), (6, 6)
     ])
@@ -111,4 +112,4 @@ class Grade(models.Model):
     
     def __str__(self):
         # Mozna zmienic ze pelne liczby bez zera -> if then [:1] else return self.grade
-        return str(self.grade)
+        return str(self.mark)

@@ -4,7 +4,7 @@ from .models import Grade, SchoolClass, SchoolYear, Semester, Student, Subject, 
 
 @admin.register(Grade)
 class GradeAdmin(admin.ModelAdmin):
-    list_display = ('grade', 'student', 'subject', 'semester')
+    list_display = ('mark', 'student', 'subject', 'semester')
     # list_display_links = ('grade', 'student', 'subject', 'semester')
     # list_editable = ('student', 'subject', 'semester')
 

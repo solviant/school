@@ -1,9 +1,9 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import redirect, get_object_or_404, render
 from django.urls import reverse
-from .forms import LoginForm, UserRegistrationForm, GradeForm
+from .forms import LoginForm, UserRegistrationForm, GradeForm, GradeToEdit
 from .models import Grade, SchoolYear, Semester, SchoolClass, Subject, Student, Teacher
 
 
@@ -50,14 +50,15 @@ def teacher_panel(request):
 def class_students(request, school_class_id):
     school_class = get_object_or_404(SchoolClass, id=school_class_id)
     # subject = get_object_or_404(Subject, id=subject_id)
-    students = Student.objects.all()
+    students = Student.objects.all() # !! to poprawic, zeby bbyli tylko uczniowie z klasy
     return render(request, 'schoolregister/nauczyciel/klasa_uczniowie.html', {
         'school_class': school_class, 'students': students})
 
 
 @login_required
 def class_detail(request, school_class_id, subject_id):
-    school_class = get_object_or_404(SchoolClass, id=1) # id=school_class_id
+    #! Is this all necessary?
+    school_class = get_object_or_404(SchoolClass, id=school_class_id) # id=school_class_id
     semesters = school_class.school_year.semester_set.all()
     students = school_class.students.all()
     # co jesli student zostal przeniesiony?
@@ -65,7 +66,7 @@ def class_detail(request, school_class_id, subject_id):
     grades_2_sem = []
     grades = Grade.objects.all() # to zmienic - jest tu jedynie do max_count_grades, powinno dac sie inaczej
 
-    subject = Subject.objects.get(id=1) # id=subject_id
+    subject = Subject.objects.get(id=subject_id) # id=subject_id
     # students_grades = [{'students': uczniowie_lista}, {'grades': []}]
     x = {'Wozniak': [1, 2, 3]}
     max_count_grades_1_sem = 0
@@ -74,7 +75,9 @@ def class_detail(request, school_class_id, subject_id):
     i = -1
 
     empty_spaces_1_sem = [] # !! check all inst
+    empty_spaces_2_sem = [] # !! check all inst
     to_max_grades = ''
+    to_max_grades2 = ''
 
     """Depending of accepted choice - add proper logic description"""
 
@@ -82,7 +85,10 @@ def class_detail(request, school_class_id, subject_id):
         # sprawdzic mozliwosc uzycia "entry_set"
         for semester in semesters:
             if semester.number == 1:
-                grades_count_1_sem = len(grades.filter(school_year_id=school_class.school_year.id, semester_id=semester.id, subject_id=subject.id, student_id=sc_student.id))
+                grades_count_1_sem = len(grades.filter(
+                    school_year_id=school_class.school_year.id, 
+                    semester_id=semester.id, subject_id=subject.id, 
+                    student_id=sc_student.id))
                 if max_count_grades_1_sem < grades_count_1_sem:
                     max_count_grades_1_sem = grades_count_1_sem
                 diff = max_count_grades_1_sem - grades_count_1_sem
@@ -91,18 +97,29 @@ def class_detail(request, school_class_id, subject_id):
                     to_max_grades += '1'
                 empty_spaces_1_sem.append(to_max_grades)
             elif semester.number == 2:
-                grades_count_2_sem = len(grades.filter(school_year_id=school_class.school_year.id, semester_id=semester.id, subject_id=subject.id, student_id=sc_student.id))
+                grades_count_2_sem = len(grades.filter(
+                    school_year_id=school_class.school_year.id, 
+                    semester_id=semester.id, subject_id=subject.id, 
+                    student_id=sc_student.id))
                 if max_count_grades_2_sem < grades_count_2_sem:
                     max_count_grades_2_sem = grades_count_2_sem
+                diff = max_count_grades_2_sem - grades_count_2_sem
+                for empty in range(0, diff):
+                    to_max_grades2 += '1'
+                empty_spaces_2_sem.append(to_max_grades2)
 
 
     col_span_1_sem = max_count_grades_1_sem + 3
     col_span_2_sem = max_count_grades_2_sem + 3
     col_span_year = col_span_1_sem + col_span_2_sem
 
+    #! naprawic studentow - zeby byli oddzielnie dla 1go i 2go semestru
+
     for student in students:
-        grades_1_sem.append(student.grade_set.filter(school_year=school_class.school_year, semester=Semester.objects.get(number=1)))
-        grades_2_sem.append(student.grade_set.filter(school_year=school_class.school_year, semester=Semester.objects.get(number=2)))
+        grades_1_sem.append(student.grade_set.filter(school_year=school_class.school_year, 
+        semester=Semester.objects.get(number=1), subject=subject))
+        grades_2_sem.append(student.grade_set.filter(school_year=school_class.school_year, 
+        semester=Semester.objects.get(number=2), subject=subject))
 
     step_02 = -1
 
@@ -113,7 +130,7 @@ def class_detail(request, school_class_id, subject_id):
             grades_1_sem[step_02].append('o')"""
 
     students_grades_1_sem = list(zip(students, grades_1_sem, empty_spaces_1_sem))
-    students_grades_2_sem = list(zip(students, grades_2_sem))
+    students_grades_2_sem = list(zip(students, grades_2_sem, empty_spaces_2_sem))
 
     # for sc_student in school_class.students.all():
     #     students_list.append(sc_student)
@@ -150,10 +167,34 @@ def class_detail(request, school_class_id, subject_id):
         })
 
 
-def edit_grade(request):
-    if request.method=='GET':
-        grade_to_edit = request.GET.get['ocena']
+def edit_grade(request, grade):
+    grade_to_edit = Grade.objects.get(id=grade)
 
+    if request.method == 'POST':
+        form = GradeToEdit(request.POST, instance=grade_to_edit)
+        if form.is_valid():
+            form.save()
+            #! co tu wstawic? *2 wstawic nizej, zeby wracalo do odpowiedniej klasy
+            return redirect('schoolregister:class_detail',
+            school_class_id=grade_to_edit.school_year.schoolclass_set.get(
+                school_year=grade_to_edit.school_year, students=grade_to_edit.student).id,
+            subject_id=grade_to_edit.subject.id)
+        # else:
+        #     return HttpResponse("Error.")
+    else:
+        # grade_to_edit = GradeToEdit()
+        #! czemu tu musi byc w nawiasie 'instance=grade_to_edit'?
+        form = GradeToEdit(instance=grade_to_edit)
+    
+    
+    """ Jakas poprzednia wersja:
+    if request.method=='GET':
+        grade_to_edit = request.GET.get['grade']
+    """
+    
+    return render(request, 'schoolregister/edit_grade.html',
+    {'form': form,
+    })
 
 
 

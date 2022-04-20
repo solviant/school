@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../bookr"
+		},
+		{
+			"path": "../../Python-learning/learning-projects/learning_log"
+		},
+		{
+			"path": "../../Python-learning/learning-projects/myshopproject"
+		},
+		{
+			"path": "../learning"
+		},
+		{
+			"path": "../pomoc_ukrainie"
+		}
+	],
+	"settings": {}
+}

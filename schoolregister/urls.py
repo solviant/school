@@ -9,7 +9,10 @@ urlpatterns = [
     path('', views.dashboard, name='dashboard'),
     path('nauczyciel/', views.teacher_panel, name='teacher_panel'),
     path('nauczyciel/<int:school_class_id>/', views.class_students, name='class_students'),
-    path('nauczyciel/<int:school_class_id>/<int:subject_id>/', views.class_detail, name='class_detail'),
+    path('nauczyciel/<int:school_class_id>/<int:subject_id>/', views.class_detail,
+    name='class_detail'), 
+    path('<int:grade>/', views.edit_grade, name='edit_grade'), #! zmienic adres na ladniejszy 
+    #! path('edit_grade/', views.edit_grade, name='edit_grade'),
     # path('login/', views.user_login, name='login'),
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
