@@ -58,15 +58,16 @@ def class_students(request, school_class_id):
 @login_required
 def class_detail(request, school_class_id, subject_id):
     #! Is this all necessary?
-    school_class = get_object_or_404(SchoolClass, id=school_class_id) # id=school_class_id
+    school_class = get_object_or_404(SchoolClass, id=school_class_id)
     semesters = school_class.school_year.semester_set.all()
     students = school_class.students.all()
     # co jesli student zostal przeniesiony?
     grades_1_sem = []
     grades_2_sem = []
-    grades = Grade.objects.all() # to zmienic - jest tu jedynie do max_count_grades, powinno dac sie inaczej
+    # ponizej zmienic? - jest tu jedynie do max_count_grades, powinno? dac sie inaczej
+    grades = Grade.objects.all()
 
-    subject = Subject.objects.get(id=subject_id) # id=subject_id
+    subject = Subject.objects.get(id=subject_id)
     # students_grades = [{'students': uczniowie_lista}, {'grades': []}]
     x = {'Wozniak': [1, 2, 3]}
     max_count_grades_1_sem = 0
@@ -76,22 +77,47 @@ def class_detail(request, school_class_id, subject_id):
 
     empty_spaces_1_sem = [] # !! check all inst
     empty_spaces_2_sem = [] # !! check all inst
-    to_max_grades = ''
-    to_max_grades2 = ''
 
     """Depending of accepted choice - add proper logic description"""
 
     for sc_student in school_class.students.all():
+        for semester in semesters:
+            if semester.number == 1:
+                grades_count_1_sem = len(grades.filter(
+                    school_year_id=school_class.school_year.id, 
+                    semester_id=semester.id, subject_id=subject.id, 
+                    student_id=sc_student.id, is_final_grade=False))
+                #-
+                print('grades_count_1_sem: ', grades_count_1_sem)
+                if max_count_grades_1_sem < grades_count_1_sem:
+                    max_count_grades_1_sem = grades_count_1_sem
+            elif semester.number == 2:
+                grades_count_2_sem = len(grades.filter(
+                    school_year_id=school_class.school_year.id, 
+                    semester_id=semester.id, subject_id=subject.id, 
+                    student_id=sc_student.id, is_final_grade=False))
+                if max_count_grades_2_sem < grades_count_2_sem:
+                    max_count_grades_2_sem = grades_count_2_sem
+
+    for sc_student in school_class.students.all():
+        to_max_grades = ''
+        to_max_grades2 = ''
         # sprawdzic mozliwosc uzycia "entry_set"
         for semester in semesters:
             if semester.number == 1:
                 grades_count_1_sem = len(grades.filter(
                     school_year_id=school_class.school_year.id, 
                     semester_id=semester.id, subject_id=subject.id, 
-                    student_id=sc_student.id))
+                    student_id=sc_student.id, is_final_grade=False))
+                #-
+                print('grades_count_1_sem: ', grades_count_1_sem)
                 if max_count_grades_1_sem < grades_count_1_sem:
                     max_count_grades_1_sem = grades_count_1_sem
+                    #-
+                    print('max_count_grades_1_sem: ', max_count_grades_1_sem)
                 diff = max_count_grades_1_sem - grades_count_1_sem
+                #-
+                print('diff: ', diff)
             # if diff > 0:    
                 for empty in range(0, diff):
                     to_max_grades += '1'
@@ -100,7 +126,7 @@ def class_detail(request, school_class_id, subject_id):
                 grades_count_2_sem = len(grades.filter(
                     school_year_id=school_class.school_year.id, 
                     semester_id=semester.id, subject_id=subject.id, 
-                    student_id=sc_student.id))
+                    student_id=sc_student.id, is_final_grade=False))
                 if max_count_grades_2_sem < grades_count_2_sem:
                     max_count_grades_2_sem = grades_count_2_sem
                 diff = max_count_grades_2_sem - grades_count_2_sem
@@ -117,9 +143,11 @@ def class_detail(request, school_class_id, subject_id):
 
     for student in students:
         grades_1_sem.append(student.grade_set.filter(school_year=school_class.school_year, 
-        semester=Semester.objects.get(number=1), subject=subject))
+        semester=Semester.objects.get(number=1), subject=subject, is_final_grade=False))
         grades_2_sem.append(student.grade_set.filter(school_year=school_class.school_year, 
-        semester=Semester.objects.get(number=2), subject=subject))
+        semester=Semester.objects.get(number=2), subject=subject, is_final_grade=False))
+
+        fin_sem_grade = 0
 
     step_02 = -1
 

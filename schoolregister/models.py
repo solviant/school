@@ -3,9 +3,11 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.urls import reverse
 # z ksiazki django by example
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 class Student(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, blank=True, 
+    on_delete=models.SET_NULL)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     birth_date = models.DateField()
@@ -109,7 +111,55 @@ class Grade(models.Model):
         PROJEKT = 'Projekt'
         INNE = 'Inne'
     description = models.CharField(max_length=30, choices=GradeDescription.choices)
+
+    is_final_grade = models.BooleanField(default=False)
+
+    @property
+    def final_grade_unique_id(self):
+        fg_id = self.student.id + self.subject.id + self.school_year.id + self.semester.id
+        return fg_id
     
+    #! Chyba trzeba tez zrobic cleana, zeby nie bylo zmiany ocen na ocene semestralna na inne sposoby?:
+    """
+    def clean(self)
+        if not Grade.objects.annotate(num_subscribers=Count('subscriber'))
+                            .filter(num_subscribers__lt=4)
+                            .exists():
+            raise ValidationError('The pools are all full.')
+    """
+
+    def save(self, *args, **kwargs):
+        if self.is_final_grade:
+            try:
+                temp = Grade.objects.get(student=self.student, school_year=self.school_year,
+                semester=self.semester, subject=self.subject, is_final_grade=True)
+                if self != temp:
+                    raise ValidationError('There can be only one final semestral grade.')
+            except Grade.DoesNotExist:
+                pass
+        super(Grade, self).save(*args, **kwargs)
+
     def __str__(self):
         # Mozna zmienic ze pelne liczby bez zera -> if then [:1] else return self.grade
         return str(self.mark)
+
+    """ Previous WIP:
+    def save(self, *args, **kwargs):
+        is_final_grade_in_sem = Grade.objects.filter(student=self.student, school_year=self.school_year,
+        semester=self.semester, subject=self.subject)
+        if not self.is_final_grade:
+            super(Grade, self).save(*args, **kwargs)
+        elif self.is_final_grade and is_final_grade not in all_grades_in_sem:
+
+        if self.is_the_chosen_one:
+            try:
+                temp = Character.objects.get(is_the_chosen_one=True)
+                if self != temp:
+                    temp.is_the_chosen_one = False
+                    temp.save()
+            except Character.DoesNotExist:
+                pass
+        super(Character, self).save(*args, **kwargs)
+    """
+
+    
