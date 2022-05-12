@@ -22,7 +22,21 @@ class GradeForm(forms.ModelForm):
 class GradeToEdit(forms.ModelForm):
     class Meta:
         model = Grade
-        fields = ('mark', 'school_year', 'semester', 'subject', 'student', 'description')
+        fields = ('mark', 'school_year', 'semester', 'subject', 'student', 
+        'description', 'is_final_grade')
+
+
+class FinalGradeForm(forms.ModelForm):
+    school_year = forms.ModelChoiceField(queryset=SchoolYear.objects.all(), widget=forms.HiddenInput())
+    semester = forms.ModelChoiceField(queryset=Semester.objects.all(), widget=forms.HiddenInput())
+    subject = forms.ModelChoiceField(queryset=Subject.objects.all(), widget=forms.HiddenInput())
+    student = forms.ModelChoiceField(queryset=Student.objects.all(), widget=forms.HiddenInput())
+    is_final_grade = forms.BooleanField(widget=forms.HiddenInput())
+    
+    class Meta:
+        model = Grade
+        fields = ('mark', 'school_year', 'semester', 'subject', 'student', 
+        'description', 'is_final_grade')
 
 
 class LoginForm(forms.Form):

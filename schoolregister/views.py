@@ -1,9 +1,10 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+from django.db.models import Avg
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, get_object_or_404, render
 from django.urls import reverse
-from .forms import LoginForm, UserRegistrationForm, GradeForm, GradeToEdit
+from .forms import LoginForm, UserRegistrationForm, GradeForm, GradeToEdit, FinalGradeForm
 from .models import Grade, SchoolYear, Semester, SchoolClass, Subject, Student, Teacher
 
 
@@ -87,8 +88,6 @@ def class_detail(request, school_class_id, subject_id):
                     school_year_id=school_class.school_year.id, 
                     semester_id=semester.id, subject_id=subject.id, 
                     student_id=sc_student.id, is_final_grade=False))
-                #-
-                print('grades_count_1_sem: ', grades_count_1_sem)
                 if max_count_grades_1_sem < grades_count_1_sem:
                     max_count_grades_1_sem = grades_count_1_sem
             elif semester.number == 2:
@@ -109,16 +108,7 @@ def class_detail(request, school_class_id, subject_id):
                     school_year_id=school_class.school_year.id, 
                     semester_id=semester.id, subject_id=subject.id, 
                     student_id=sc_student.id, is_final_grade=False))
-                #-
-                print('grades_count_1_sem: ', grades_count_1_sem)
-                if max_count_grades_1_sem < grades_count_1_sem:
-                    max_count_grades_1_sem = grades_count_1_sem
-                    #-
-                    print('max_count_grades_1_sem: ', max_count_grades_1_sem)
                 diff = max_count_grades_1_sem - grades_count_1_sem
-                #-
-                print('diff: ', diff)
-            # if diff > 0:    
                 for empty in range(0, diff):
                     to_max_grades += '1'
                 empty_spaces_1_sem.append(to_max_grades)
@@ -127,8 +117,6 @@ def class_detail(request, school_class_id, subject_id):
                     school_year_id=school_class.school_year.id, 
                     semester_id=semester.id, subject_id=subject.id, 
                     student_id=sc_student.id, is_final_grade=False))
-                if max_count_grades_2_sem < grades_count_2_sem:
-                    max_count_grades_2_sem = grades_count_2_sem
                 diff = max_count_grades_2_sem - grades_count_2_sem
                 for empty in range(0, diff):
                     to_max_grades2 += '1'
@@ -140,14 +128,36 @@ def class_detail(request, school_class_id, subject_id):
     col_span_year = col_span_1_sem + col_span_2_sem
 
     #! naprawic studentow - zeby byli oddzielnie dla 1go i 2go semestru
+    final_1_sem_grade = []
+    final_2_sem_grade = []
+    avg_grades_1_sem = []
+    avg_grades_2_sem = []
 
     for student in students:
-        grades_1_sem.append(student.grade_set.filter(school_year=school_class.school_year, 
-        semester=Semester.objects.get(number=1), subject=subject, is_final_grade=False))
-        grades_2_sem.append(student.grade_set.filter(school_year=school_class.school_year, 
-        semester=Semester.objects.get(number=2), subject=subject, is_final_grade=False))
-
-        fin_sem_grade = 0
+        # 1st semester grades and average grade
+        student_grades_1_sem = student.grade_set.filter(school_year=school_class.school_year, 
+        semester=Semester.objects.get(number=1), subject=subject, is_final_grade=False)
+        grades_1_sem.append(student_grades_1_sem)
+        student_avg_grade = student_grades_1_sem.aggregate(Avg('mark'))
+        if student_avg_grade['mark__avg'] == None:
+            student_avg_grade_number = None
+        else:
+            student_avg_grade_number = round(float(student_avg_grade['mark__avg']), 1)
+        avg_grades_1_sem.append(student_avg_grade_number)
+        # 1st semester final grade
+        student_final_grade_1_sem = student.grade_set.filter(school_year=school_class.school_year, 
+        semester=Semester.objects.get(number=1), subject=subject, is_final_grade=True).first()
+        final_1_sem_grade.append(student_final_grade_1_sem)
+        # 2nd semester grades and average grade
+        student_grades_2_sem = student.grade_set.filter(school_year=school_class.school_year, 
+        semester=Semester.objects.get(number=2), subject=subject, is_final_grade=False)
+        grades_2_sem.append(student_grades_2_sem)
+        student_avg_grade = student_grades_2_sem.aggregate(Avg('mark'))
+        avg_grades_2_sem.append(student_avg_grade)
+        # 2nd semester final grade
+        student_final_grade_2_sem = student.grade_set.filter(school_year=school_class.school_year, 
+        semester=Semester.objects.get(number=2), subject=subject, is_final_grade=True).first()
+        final_2_sem_grade.append(student_final_grade_2_sem)
 
     step_02 = -1
 
@@ -157,8 +167,9 @@ def class_detail(request, school_class_id, subject_id):
         for fill_grades in range(1, step_02):
             grades_1_sem[step_02].append('o')"""
 
-    students_grades_1_sem = list(zip(students, grades_1_sem, empty_spaces_1_sem))
-    students_grades_2_sem = list(zip(students, grades_2_sem, empty_spaces_2_sem))
+    students_grades_1_sem = list(zip(students, grades_1_sem, 
+    empty_spaces_1_sem, final_1_sem_grade, avg_grades_1_sem))
+    students_grades_2_sem = list(zip(students, grades_2_sem, empty_spaces_2_sem, final_1_sem_grade))
 
     # for sc_student in school_class.students.all():
     #     students_list.append(sc_student)
@@ -169,13 +180,19 @@ def class_detail(request, school_class_id, subject_id):
     if request.method == 'POST':
         grade_form = GradeForm(request.POST)
         # grade_form.subject = subject  # To nie działa
+        #! stworzyc nowy formularz "edit_final_grade" i zmienic na niego ponizej
+        final_grade_form = FinalGradeForm(request.POST)
         if grade_form.is_valid():
             grade_form.save()
+            return HttpResponseRedirect('')
+        if final_grade_form.is_valid():
+            final_grade_form.save()
             return HttpResponseRedirect('')
         # else:
         #     return HttpResponse("Error.")
     else:
         grade_form = GradeForm()
+        final_grade_form = FinalGradeForm()
         # grade_form.subject = subject  # To nie działa
 
 
@@ -187,6 +204,7 @@ def class_detail(request, school_class_id, subject_id):
         'students_grades_2_sem': students_grades_2_sem,
         'max_count_grades_1_sem': max_count_grades_1_sem,
         'max_count_grades_2_sem': max_count_grades_2_sem, 
+        'final_grade_form': final_grade_form, 
         'col_span_1_sem': col_span_1_sem, # czy to potrzebne?
         'col_span_2_sem': col_span_2_sem, # czy to potrzebne?
         'col_span_year': col_span_year, # czy to potrzebne?

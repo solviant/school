@@ -2,12 +2,14 @@
 <!-- Trzeba dodać nauczyciela - ktory edytuje te klase. -->
 <!DOCTYPE html>
 <html>
-
+{% extends "base.html" %}
+{% comment %}{% extends "base.html" %}{% endcomment %}
+{% block content %}
 <head>
 <style>
     #school_year_logo {
         position: absolute;
-        top: 10px;
+        top: 60px;
         right: 10px;
     }
 </style>
@@ -19,10 +21,10 @@
     <p>Pierwszy semestr</p>
     <table border>
         <tr>
-            <th>Uczniowie</th>
+            <th bgcolor="GoldenRod">Uczniowie</th>
             {% for semester in semesters %}
                 {% if semester.number == 1 %}
-                    <th colspan = {{ col_span_1_sem }}>Oceny - semestr {{ semester.number }}</th>
+                    <th colspan = {{ col_span_1_sem }} bgcolor="BurlyWood">Oceny - semestr {{ semester.number }}</th>
                 {% endif %}
             {% endfor %}
         </tr>
@@ -30,17 +32,17 @@
             {% if semester.number == 1 %}
                 {% for student in students_grades_1_sem %}
                     <tr>
-                        <td>{{ student.0 }}</td>
+                        <td bgcolor="Bisque">{{ student.0 }}</td>
                             <!-- to zamiast cyclowac w gradzie moze powinno w zbiorze jakos student-grade -->
                             {% for grade in student.1 %}
-                                <td><a href="{% url 'schoolregister:edit_grade' grade.id %}" value="{{ grade }}">{{ grade }}</a><br>
+                                <td bgcolor="Cornsilk"><a href="{% url 'schoolregister:edit_grade' grade.id %}" value="{{ grade }}">{{ grade }}</a><br>
                                     {{ grade.description }}<br>
                                 </td>
                             {% endfor %}
                             {% for to_max in student.2 %}
-                                <td></td>
+                                <td bgcolor="Cornsilk"></td>
                             {% endfor %}
-                                <td>
+                                <td bgcolor="Azure">
                                     Nowa ocena:
                                     <form method="post">
                                         {{ grade_form.as_p }}
@@ -52,11 +54,30 @@
                                         <p><input type="submit" value="Dodaj"></p>
                                     </form>
                                 </td>
-                                <td>
-                                    Ocena końcowa:
+                                <td bgcolor="FloralWhite">
+                                    Średnia ocen: <br>
+                                    {% if student.4 != None %}
+                                        {{ student.4 }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
                                 </td>
-                                <td>
-                                    Średnia ocen:
+                                <td bgcolor="Gainsboro">
+                                    Ocena końcowa: <br>
+                                    {% if student.3 != None %}
+                                        <a href="{% url 'schoolregister:edit_grade' student.3.id %}" value="{{ student.3 }}">{{ student.3 }}</a>
+                                    {% else %}
+                                        <form method="post">
+                                            {{ final_grade_form.as_p }}
+                                            {% csrf_token %}
+                                            <input type="hidden" name="school_year" value={{ school_class.school_year.id }} />
+                                            <input type="hidden" name="semester" value={{ semester.id }} />
+                                            <input type="hidden" name="subject" value={{ subject.id }} />
+                                            <input type="hidden" name="student" value={{ student.0.id }} />
+                                            <input type="hidden" name="is_final_grade" value={{ True }} />
+                                            <p><input type="submit" value="Dodaj"></p>
+                                        </form>    
+                                    {% endif %}
                                 </td>
                 {% endfor %}
             {% endif %}
@@ -66,10 +87,10 @@
     <p>Drugi semestr</p>          
     <table border>
         <tr>
-            <th>Uczniowie</th>
+            <th bgcolor="GoldenRod">Uczniowie</th>
             {% for semester in semesters %}
                 {% if semester.number == 2 %}
-                    <th colspan = {{ col_span_2_sem }}>Oceny - semestr {{ semester.number }}</th>
+                    <th colspan = {{ col_span_2_sem }} bgcolor="BurlyWood">Oceny - semestr {{ semester.number }}</th>
                 {% endif %}
             {% endfor %}
         </tr>
@@ -77,17 +98,17 @@
             {% if semester.number == 2 %}
                 {% for student in students_grades_2_sem %}
                     <tr>
-                        <td>{{ student.0 }}</td>
+                        <td bgcolor="Bisque">{{ student.0 }}</td>
                             <!-- to zamiast cyclowac w gradzie moze powinno w zbiorze jakos student-grade -->
                             {% for grade in student.1 %}
-                                <td><a href="{% url 'schoolregister:edit_grade' grade.id %}" value="{{ grade }}">{{ grade }}</a><br>
+                                <td bgcolor="Cornsilk"><a href="{% url 'schoolregister:edit_grade' grade.id %}" value="{{ grade }}">{{ grade }}</a><br>
                                     {{ grade.description }}<br>
                                 </td>
                             {% endfor %}
                             {% for to_max2 in student.2 %}
-                                <td></td>
+                                <td bgcolor="Cornsilk"></td>
                             {% endfor %}
-                                <td>
+                                <td bgcolor="Azure">
                                     Nowa ocena:
                                     <form method="post">
                                         {{ grade_form.as_p }}
@@ -99,10 +120,10 @@
                                         <p><input type="submit" value="Dodaj"></p>
                                     </form>
                                 </td>
-                                <td>
+                                <td bgcolor="FloralWhite">
                                     Ocena końcowa:
                                 </td>
-                                <td>
+                                <td bgcolor="Gainsboro">
                                     Średnia ocen:
                                 </td>
                 {% endfor %}
@@ -111,4 +132,5 @@
                 </tr>
     </table>
 </body>
+{% endblock %}
 </html>
